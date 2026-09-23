@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1f4e78">
+<meta name="description" content="Calculadora rápida de precificação para marketplaces">
+<title>Precifica Fácil</title>
+<style>
+:root{--blue:#1f4e78;--light:#eef5fa;--border:#d9e1e8;--text:#1f2937;--muted:#667085;--green:#e7f4e8}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f6f8fa;color:var(--text)}
+main{width:min(100%,460px);margin:0 auto;padding:18px 14px 30px}
+header{background:var(--blue);color:#fff;border-radius:18px;padding:20px;margin-bottom:14px}
+h1{font-size:24px;margin:0 0 5px}header p{margin:0;opacity:.9;font-size:14px}
+.card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:14px;font-weight:700;margin:12px 0 6px}
+input{width:100%;height:48px;border:1px solid var(--border);border-radius:11px;padding:0 13px;font-size:18px;color:var(--text);background:#fff}
+input:focus{outline:2px solid #9cc3df;border-color:var(--blue)}
+.result{background:var(--light);border-radius:16px;padding:18px;text-align:center}
+.result small{color:var(--muted);font-weight:700}
+.price{font-size:36px;font-weight:800;color:var(--blue);margin:5px 0 14px}
+.row{display:flex;justify-content:space-between;border-top:1px solid var(--border);padding:10px 0;font-size:14px}
+.row strong{font-size:15px}
+.profit{font-size:18px!important}
+button{width:100%;height:48px;border:1px solid var(--border);border-radius:11px;background:#fff;font-size:16px;font-weight:700;margin-top:12px;cursor:pointer}
+button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:10px}
+.error{color:#a33;font-weight:700;font-size:14px;margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>💰 Precifica Fácil</h1>
+<p>Descubra rapidamente por quanto vender seu produto.</p>
+</header>
+
+<section class="card">
+<label for="purchase">Preço de compra (R$)</label>
+<input id="purchase" type="number" min="0" step="0.01" value="20" inputmode="decimal">
+
+<label for="shipping">Frete (R$)</label>
+<input id="shipping" type="number" min="0" step="0.01" value="8" inputmode="decimal">
+
+<label for="commission">Comissão do marketplace (%)</label>
+<input id="commission" type="number" min="0" max="99.99" step="0.01" value="20" inputmode="decimal">
+
+<label for="ads">Ads (%)</label>
+<input id="ads" type="number" min="0" max="99.99" step="0.01" value="10" inputmode="decimal">
+
+<label for="margin">Margem desejada (%)</label>
+<input id="margin" type="number" min="0" max="99.99" step="0.01" value="20" inputmode="decimal">
+
+<button id="reset">↺ Restaurar valores</button>
+</section>
+
+<section class="card">
+<div class="result" aria-live="polite">
+<small>PREÇO DE VENDA SUGERIDO</small>
+<div class="price" id="price">R$ 0,00</div>
+<div id="error" class="error" hidden></div>
+<div class="row"><span>Custo + frete</span><strong id="cost">R$ 0,00</strong></div>
+<div class="row"><span>Comissão</span><strong id="commissionValue">R$ 0,00</strong></div>
+<div class="row"><span>Ads</span><strong id="adsValue">R$ 0,00</strong></div>
+<div class="row"><span>Lucro líquido</span><strong class="profit" id="profit">R$ 0,00</strong></div>
+</div>
+<p class="note">Frete padrão: R$ 8,00. Você pode alterar quando quiser. A margem é calculada sobre o preço de venda.</p>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const n=id=>Math.max(0,Number.parseFloat($(id).value)||0);
+const money=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(v);
+
+function calculate(){
+ const purchase=n('purchase'), shipping=n('shipping');
+ const commission=n('commission')/100, ads=n('ads')/100, margin=n('margin')/100;
+ const denominator=1-commission-ads-margin;
+ const error=$('error');
+ if(denominator<=0){
+   $('price').textContent='Ajuste os percentuais';
+   error.hidden=false;
+   error.textContent='Comissão + Ads + margem precisam somar menos de 100%.';
+   return;
+ }
+ error.hidden=true;
+ const fixed=purchase+shipping;
+ const price=fixed/denominator;
+ const cv=price*commission, av=price*ads, profit=price-fixed-cv-av;
+ $('price').textContent=money(price);
+ $('cost').textContent=money(fixed);
+ $('commissionValue').textContent=money(cv);
+ $('adsValue').textContent=money(av);
+ $('profit').textContent=money(profit);
+}
+['purchase','shipping','commission','ads','margin'].forEach(id=>$(id).addEventListener('input',calculate));
+$('reset').addEventListener('click',()=>{
+ $('purchase').value=20;$('shipping').value=8;$('commission').value=20;$('ads').value=10;$('margin').value=20;calculate();
+});
+calculate();
+</script>
+</body>
+</html>
