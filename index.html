@@ -37,7 +37,7 @@ button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
 
 <section class="card">
 <label for="purchase">Preço de compra (R$)</label>
-<input id="purchase" type="number" min="0" step="0.01" value="20" inputmode="decimal">
+<input id="purchase" type="number" min="0" step="0.01" value="0" inputmode="decimal">
 
 <label for="shipping">Frete (R$)</label>
 <input id="shipping" type="number" min="0" step="0.01" value="8" inputmode="decimal">
@@ -46,7 +46,7 @@ button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
 <input id="commission" type="number" min="0" max="99.99" step="0.01" value="20" inputmode="decimal">
 
 <label for="ads">Ads (%)</label>
-<input id="ads" type="number" min="0" max="99.99" step="0.01" value="10" inputmode="decimal">
+<input id="ads" type="number" min="0" max="99.99" step="0.01" value="0" inputmode="decimal">
 
 <label for="margin">Margem desejada (%)</label>
 <input id="margin" type="number" min="0" max="99.99" step="0.01" value="20" inputmode="decimal">
@@ -96,7 +96,7 @@ function calculate(){
 }
 ['purchase','shipping','commission','ads','margin'].forEach(id=>$(id).addEventListener('input',calculate));
 $('reset').addEventListener('click',()=>{
- $('purchase').value=20;$('shipping').value=8;$('commission').value=20;$('ads').value=10;$('margin').value=20;calculate();
+ $('purchase').value=0;$('shipping').value=8;$('commission').value=20;$('ads').value=0;$('margin').value=20;calculate();
 });
 calculate();
 </script>
